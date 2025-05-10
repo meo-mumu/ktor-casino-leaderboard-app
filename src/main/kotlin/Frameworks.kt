@@ -1,5 +1,7 @@
 package com
 
+import com.model.InMemoryPlayerRepository
+import com.model.PlayerRepository
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.http.content.*
@@ -14,11 +16,7 @@ fun Application.configureFrameworks() {
     install(Koin) {
         slf4jLogger()
         modules(module {
-            single<HelloService> {
-                HelloService {
-                    println(environment.log.info("Hello, World!"))
-                }
-            }
+            single<PlayerRepository> { InMemoryPlayerRepository() }
         })
     }
 }
