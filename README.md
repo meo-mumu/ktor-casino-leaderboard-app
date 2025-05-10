@@ -41,6 +41,8 @@ If the server starts successfully, you'll see the following output:
 2024-12-04 14:32:45.584 [main] INFO  Application - Application started in 0.303 seconds.
 2024-12-04 14:32:45.682 [main] INFO  Application - Responding at http://0.0.0.0:8080
 
+-------------------------------------------------------------------
+
 [feat] Ajouter une nouvelle fonctionnalité
 [fix] Corriger un bug
 [refactor] Refactorisation de code
@@ -49,6 +51,33 @@ If the server starts successfully, you'll see the following output:
 [build] Configuration build / dépendances
 [style] Formatage / lint
 [chore] Tâches diverses (nettoyage, renommage...)
+
+-------------------------------------------------------------------
+TODO
+1. Gestion des erreur
+2. Commit
+3. Test
+4. Commit
+5. Koin
+commit
+6. DynamoDb
+commit
+7. Test
+commit
+7. Tournois
+commit
+8. define
+    ranking alors que meme nombre de points
+    CI CD ?
+     
+
+Autres : 
+- Ajouter la notion de tournois
+- Pour l'update des points faire quelque chose d'intelligent. par exemple un player peut perdre des points. Ou peut se faire réinitialiser des points
+- Koin
+- DynamoDb
+
+
 
 
 ```
