@@ -12,15 +12,14 @@ class InMemoryPlayerRepository : PlayerRepository {
         return players.firstOrNull { it.pseudo.equals(pseudo, ignoreCase = true) }
     }
 
-
-    override fun addPlayerByPseudo(pseudo: String) {
+    override suspend fun addPlayerByPseudo(pseudo: String) {
         if (getPlayerByPseudo(pseudo) != null) {
             throw IllegalStateException("Player with pseudo $pseudo already exists")
         }
         players.add(Player(pseudo))
     }
 
-    override fun updatePlayerPoints(pseudo: String, pointsToAdd: Int) {
+    override suspend fun updatePlayerPoints(pseudo: String, pointsToAdd: Int) {
         val player = getPlayerByPseudo(pseudo)
         if (player == null) {
             throw NoSuchElementException("Player with pseudo $pseudo not found")
@@ -28,7 +27,7 @@ class InMemoryPlayerRepository : PlayerRepository {
         player.points += pointsToAdd
     }
 
-    override fun getPlayerWithRankByPseudo(pseudo: String): PlayerPointsRank {
+    override suspend fun getPlayerWithRankByPseudo(pseudo: String): PlayerPointsRank {
         val sortedPlayers = players.sortedByDescending { it.points }
         val player = sortedPlayers.find { it.pseudo.equals(pseudo, ignoreCase = true) }
         if (player == null) {
@@ -39,7 +38,7 @@ class InMemoryPlayerRepository : PlayerRepository {
     }
 
 
-    override fun getAllPlayersSortedByRank(): List<PlayerPointsRank> {
+    override suspend fun getAllPlayersSortedByRank(): List<PlayerPointsRank> {
         if (players.isEmpty()) {
             throw NoSuchElementException("No players found")
         }
@@ -51,7 +50,7 @@ class InMemoryPlayerRepository : PlayerRepository {
             }
     }
 
-    override fun clearAllPlayers() {
+    override suspend fun clearAllPlayers() {
         players.clear()
     }
 }

@@ -3,9 +3,9 @@
 package com.model
 
 interface PlayerRepository {
-    fun addPlayerByPseudo(pseudo: String)
-    fun updatePlayerPoints(pseudo: String, pointsToAdd: Int)
-    fun getAllPlayersSortedByRank(): List<PlayerPointsRank>
-    fun getPlayerWithRankByPseudo(pseudo: String): PlayerPointsRank
-    fun clearAllPlayers()
+    suspend fun addPlayerByPseudo(pseudo: String)
+    suspend fun updatePlayerPoints(pseudo: String, pointsToAdd: Int)
+    suspend fun getAllPlayersSortedByRank(): List<PlayerPointsRank>
+    suspend fun getPlayerWithRankByPseudo(pseudo: String): PlayerPointsRank
+    suspend fun clearAllPlayers()
 }
