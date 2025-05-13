@@ -27,18 +27,18 @@ class InMemoryPlayerRepository : PlayerRepository {
         player.points += pointsToAdd
     }
 
-    override suspend fun getPlayerWithRankByPseudo(pseudo: String): PlayerPointsRank {
+    override suspend fun getPlayerWithRankByPseudo(pseudo: String): Player {
         val sortedPlayers = players.sortedByDescending { it.points }
         val player = sortedPlayers.find { it.pseudo.equals(pseudo, ignoreCase = true) }
         if (player == null) {
             throw NoSuchElementException("Player with pseudo $pseudo not found")
         }
         val rank = sortedPlayers.indexOf(player) + 1
-        return PlayerPointsRank(player.pseudo, player.points, rank)
+        return Player(player.pseudo, player.points, rank)
     }
 
 
-    override suspend fun getAllPlayersSortedByRank(): List<PlayerPointsRank> {
+    override suspend fun getAllPlayersSortedByRank(): List<Player> {
         if (players.isEmpty()) {
             throw NoSuchElementException("No players found")
         }
@@ -46,7 +46,7 @@ class InMemoryPlayerRepository : PlayerRepository {
         return players
             .sortedByDescending { it.points }
             .mapIndexed { index, player ->
-                PlayerPointsRank(player.pseudo, player.points, index + 1)
+                Player(player.pseudo, player.points, index + 1)
             }
     }
 

@@ -1,6 +1,7 @@
 package com.model
 
 import com.db.POINTS_GSI_NAME
+import org.slf4j.LoggerFactory
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue
 import software.amazon.awssdk.services.dynamodb.model.ConditionalCheckFailedException
@@ -10,6 +11,8 @@ import software.amazon.awssdk.services.dynamodb.model.QueryRequest
 import software.amazon.awssdk.services.dynamodb.model.ScanRequest
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest
 import software.amazon.awssdk.services.dynamodb.model.DeleteItemRequest
+
+private val log = LoggerFactory.getLogger("DynamoPlayerRepository")
 
 class DynamoPlayerRepository(
     private val client: DynamoDbClient,
@@ -30,6 +33,7 @@ class DynamoPlayerRepository(
         )
 
     private fun getPlayersSortedByPointsDesc(): List<Player> {
+        log.info("Querying all players sorted by points (desc) using GSI")
         val queryRequest = QueryRequest.builder()
             .tableName(tableName)
             .indexName(POINTS_GSI_NAME)
@@ -78,20 +82,20 @@ class DynamoPlayerRepository(
         }
     }
 
-    override suspend fun getAllPlayersSortedByRank(): List<PlayerPointsRank> {
+    override suspend fun getAllPlayersSortedByRank(): List<Player> {
         val players = getPlayersSortedByPointsDesc()
         if (players.isEmpty()) throw NoSuchElementException("No players found")
         return players.mapIndexed { idx, player ->
-            PlayerPointsRank(player.pseudo, player.points, idx + 1)
+            Player(player.pseudo, player.points, idx + 1)
         }
     }
 
-    override suspend fun getPlayerWithRankByPseudo(pseudo: String): PlayerPointsRank {
+    override suspend fun getPlayerWithRankByPseudo(pseudo: String): Player {
         val players = getPlayersSortedByPointsDesc()
         val player = players.find { it.pseudo.equals(pseudo, ignoreCase = true) }
             ?: throw NoSuchElementException("Player with pseudo $pseudo not found")
         val rank = players.indexOf(player) + 1
-        return PlayerPointsRank(player.pseudo, player.points, rank)
+        return Player(player.pseudo, player.points, rank)
     }
 
     override suspend fun clearAllPlayers() {

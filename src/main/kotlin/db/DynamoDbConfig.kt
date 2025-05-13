@@ -7,6 +7,7 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import software.amazon.awssdk.regions.Region
 
 import org.koin.ktor.ext.inject
+import org.slf4j.LoggerFactory
 
 import software.amazon.awssdk.services.dynamodb.model.CreateTableRequest
 import software.amazon.awssdk.services.dynamodb.model.AttributeDefinition
@@ -21,14 +22,17 @@ import software.amazon.awssdk.services.dynamodb.model.ProvisionedThroughput
 import software.amazon.awssdk.services.dynamodb.model.ResourceNotFoundException
 import java.net.URI
 
+private val log = LoggerFactory.getLogger("App")
+
 const val DYNAMO_SERVER_URL = "http://localhost:8000"
 const val AWS_ACCESS_KEY_ID = "accessKey"
 const val AWS_SECRET_ACCESS_KEY = "secretKey"
 const val POINTS_GSI_NAME = "PointsIndex"
 
 object DynamoDbClientFactory {
-    fun create(): DynamoDbClient =
-        DynamoDbClient.builder()
+    fun create(): DynamoDbClient {
+        log.info("Creation client DynamoDb on  $DYNAMO_SERVER_URL")
+        return DynamoDbClient.builder()
             .endpointOverride(URI.create(DYNAMO_SERVER_URL))
             .region(Region.EU_WEST_1)
             .credentialsProvider(
@@ -37,6 +41,7 @@ object DynamoDbClientFactory {
                 )
             )
             .build()
+    }
 }
 
 fun ensurePlayersTable(client: DynamoDbClient, tableName: String = "Players") {
@@ -44,13 +49,16 @@ fun ensurePlayersTable(client: DynamoDbClient, tableName: String = "Players") {
         client.describeTable(
             DescribeTableRequest.builder().tableName(tableName).build()
         )
-        // Table exists, nothing to do
+        log.info("Table $tableName already exists")
     } catch (e: ResourceNotFoundException) {
+        log.info("Table $tableName does not exist, creating table...")
         createPlayersTable(client)
+        log.info("Table $tableName creation successful")
     }
 }
 
 fun createPlayersTable(client: DynamoDbClient) {
+    log.info("Create table Players with GSI (tournament, points)...")
     val request = CreateTableRequest.builder()
         .tableName("Players")
         .keySchema(
@@ -112,5 +120,8 @@ fun createPlayersTable(client: DynamoDbClient) {
 
 fun Application.configureDynamoDb() {
     val dynamoClient by inject<DynamoDbClient>()
+    log.info("DynamoDbClient injected: ${dynamoClient::class.simpleName}")
+    log.info("Configuration DynamoDB launched")
     ensurePlayersTable(dynamoClient)
+    log.info("Configuration DynamoDB end")
 }

@@ -7,12 +7,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Player(
     val pseudo: String,
-    var points: Int = 0
-)
-
-@Serializable
-data class PlayerPointsRank(
-    val pseudo: String,
-    val points: Int,
-    val rank: Int
+    var points: Int = 0,
+    val rank: Int? = null // Optionnel
 )
