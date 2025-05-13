@@ -13,12 +13,21 @@ import org.koin.ktor.ext.inject
 import org.slf4j.LoggerFactory
 
 @Serializable
-data class PlayerRequest(val pseudo: String)
+data class PlayerRequest(val pseudo: String) {
+    fun validate() {
+        require(pseudo.length in 3..20) { "Pseudo must be between 3 and 20 characters." }
+        require(pseudo.matches(Regex("^[A-Za-z0-9_]+$"))) { "Pseudo must contain only letters, digits, or underscores." }
+    }
+}
 
 @Serializable
-data class UpdatePointsRequest(val points: Int)
+data class UpdatePointsRequest(val points: Int) {
+    fun validate() {
+        require(points > 0) { "Points must be a positive integer." }
+    }
+}
 
-fun Application.configureRouting() {
+fun Application.configurePlayersRoutes() {
 
     install(StatusPages) {
         val log = LoggerFactory.getLogger("Routing")
@@ -31,6 +40,11 @@ fun Application.configureRouting() {
         exception<NoSuchElementException> { call, cause ->
             log.error("Not found: ${cause.message}")
             call.respond(HttpStatusCode.NotFound, mapOf("error" to cause.message))
+        }
+
+        exception<IllegalArgumentException> { call, cause ->
+            log.error("Validation error: ${cause.message}")
+            call.respond(HttpStatusCode.BadRequest, cause.message ?: "Invalid request")
         }
 
         exception<Throwable> { call, cause ->
@@ -52,9 +66,10 @@ fun Application.configureRouting() {
                 call.respond(playersWithRank)
             }
 
-            post("add") {
+            post {
                 val request = call.receive<PlayerRequest>()
-                log.info("POST /players/add - Adding player: ${request.pseudo}")
+                log.info("POST /players - Adding player: ${request.pseudo}")
+                request.validate()
                 playerRepo.addPlayerByPseudo(request.pseudo)
                 call.respondText("Player ${request.pseudo} added successfully")
             }
@@ -76,19 +91,13 @@ fun Application.configureRouting() {
 
                 put("points") {
                     val pseudo = call.parameters["pseudo"]!!
-                    val request = call.receive<UpdatePointsRequest>()
-                    log.info("PUT /players/$pseudo/points - Updating points by ${request.points}")
-                    playerRepo.updatePlayerPoints(pseudo, request.points)
-                    call.respondText("Player $pseudo updated with ${request.points} points")
+                    val updateRequest = call.receive<UpdatePointsRequest>()
+                    log.info("PUT /players/$pseudo/points - Updating points by ${updateRequest.points}")
+                    updateRequest.validate()
+                    playerRepo.updatePlayerPoints(pseudo, updateRequest.points)
+                    call.respondText("Player $pseudo updated with ${updateRequest.points} points")
                 }
 
-                post("addPoints") {
-                    val pseudo = call.parameters["pseudo"]!!
-                    val request = call.receive<UpdatePointsRequest>()
-                    log.info("POST /players/$pseudo/addPoints - Adding points: ${request.points}")
-                    playerRepo.updatePlayerPoints(pseudo, request.points)
-                    call.respondText("Player $pseudo updated with ${request.points} points")
-                }
             }
         }
     }

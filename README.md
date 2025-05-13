@@ -54,29 +54,16 @@ If the server starts successfully, you'll see the following output:
 
 -------------------------------------------------------------------
 TODO
-1. Gestion des erreur
-2. Commit
-3. Test
-4. Commit
-5. Koin
-commit
-6. DynamoDb
-commit
-7. Test
-commit
-7. Tournois
-commit
-8. define
-    ranking alors que meme nombre de points
-    CI CD ?
-     
 
-Autres : 
-- Ajouter la notion de tournois
-- Pour l'update des points faire quelque chose d'intelligent. par exemple un player peut perdre des points. Ou peut se faire réinitialiser des points
-- Koin
-- DynamoDb
+1. Tests
+2. Deployement / CI CD ?
 
+ [ Questions ]
+ 1. Concernant DynamoDb. J'utilise une version en local qui run dans un conteneur docker. Est ce que c'est ok pour toi ?
+ 2. L'update de point pour un player n'est qu'un ajout de point pour l'instant. Je pourrais ajouter un paramètre d'update , qui permet d'enlever des points ou de réinitialiser les points d'un player. Est-ce utile ?
+ 3. Le rang des joueurs est calculé dynamiquement uniquement lors des appels où cette information est nécessaire. Cela garantit la cohérence sans nécessiter de mises à jour en cascade en base (qui serait, entre autre, très couteux). Mais si le nombre de modifications de scores est faible et que l’API est très sollicitée pour la récupération des classements, il serait envisageable d’étudier une solution de stockage ou de cache du rang. Pour l'instant, je reste sur le calcul du rank à la volée si c'est ok pour toi ? 
+ 4. Pour les players qui ont le meme nombre de point, ont aussi le meme rank ?
+ 
 
 
 

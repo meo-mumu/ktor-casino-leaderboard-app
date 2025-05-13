@@ -3,7 +3,7 @@ package com
 import com.db.configureDynamoDb
 import com.db.createPlayersTable
 import com.di.configureDependencyInjection
-import com.routing.configureRouting
+import com.routing.configurePlayersRoutes
 import com.serialization.configureSerialization
 import io.ktor.server.application.*
 import org.koin.ktor.ext.inject
@@ -17,5 +17,5 @@ fun Application.module() {
     configureSerialization()
     configureDependencyInjection()
     configureDynamoDb()
-    configureRouting()
+    configurePlayersRoutes()
 }
