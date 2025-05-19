@@ -12,21 +12,6 @@ import kotlinx.serialization.Serializable
 import org.koin.ktor.ext.inject
 import org.slf4j.LoggerFactory
 
-@Serializable
-data class PlayerRequest(val pseudo: String) {
-    fun validate() {
-        require(pseudo.length in 3..20) { "Pseudo must be between 3 and 20 characters." }
-        require(pseudo.matches(Regex("^[A-Za-z0-9_]+$"))) { "Pseudo must contain only letters, digits, or underscores." }
-    }
-}
-
-@Serializable
-data class UpdatePointsRequest(val points: Int) {
-    fun validate() {
-        require(points > 0) { "Points must be a positive integer." }
-    }
-}
-
 fun Application.configurePlayersRoutes() {
 
     install(StatusPages) {
@@ -71,13 +56,13 @@ fun Application.configurePlayersRoutes() {
                 log.info("POST /players - Adding player: ${request.pseudo}")
                 request.validate()
                 playerRepo.addPlayerByPseudo(request.pseudo)
-                call.respondText("Player ${request.pseudo} added successfully")
+                call.respond(HttpStatusCode.Created, mapOf("message" to "Player ${request.pseudo} added successfully"))
             }
 
             delete {
                 log.info("DELETE /players - Clearing all players")
                 playerRepo.clearAllPlayers()
-                call.respondText("All players removed")
+                call.respond(HttpStatusCode.NoContent)
             }
 
             route("{pseudo}") {
@@ -86,7 +71,7 @@ fun Application.configurePlayersRoutes() {
                     val pseudo = call.parameters["pseudo"]!!
                     log.info("GET /players/$pseudo - Fetching player with rank")
                     val playerWithRank = playerRepo.getPlayerWithRankByPseudo(pseudo)
-                    call.respond(playerWithRank)
+                    call.respond(HttpStatusCode.OK, playerWithRank)
                 }
 
                 put("points") {
@@ -95,10 +80,26 @@ fun Application.configurePlayersRoutes() {
                     log.info("PUT /players/$pseudo/points - Updating points by ${updateRequest.points}")
                     updateRequest.validate()
                     playerRepo.updatePlayerPoints(pseudo, updateRequest.points)
-                    call.respondText("Player $pseudo updated with ${updateRequest.points} points")
+                    call.respond(HttpStatusCode.OK, mapOf("message" to "Player $pseudo updated with ${updateRequest.points} points"))
                 }
 
             }
         }
+    }
+}
+
+
+@Serializable
+data class PlayerRequest(val pseudo: String) {
+    fun validate() {
+        require(pseudo.length in 3..20) { "Pseudo must be between 3 and 20 characters." }
+        require(pseudo.matches(Regex("^[A-Za-z0-9_]+$"))) { "Pseudo must contain only letters, digits, or underscores." }
+    }
+}
+
+@Serializable
+data class UpdatePointsRequest(val points: Int) {
+    fun validate() {
+        require(points > 0) { "Points must be a positive integer." }
     }
 }

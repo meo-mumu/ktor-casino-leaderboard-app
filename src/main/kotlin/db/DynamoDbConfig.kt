@@ -1,14 +1,12 @@
 package com.db
 
 import io.ktor.server.application.*
+import org.koin.ktor.ext.inject
+import org.slf4j.LoggerFactory
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import software.amazon.awssdk.regions.Region
-
-import org.koin.ktor.ext.inject
-import org.slf4j.LoggerFactory
-
 import software.amazon.awssdk.services.dynamodb.model.CreateTableRequest
 import software.amazon.awssdk.services.dynamodb.model.AttributeDefinition
 import software.amazon.awssdk.services.dynamodb.model.DescribeTableRequest
@@ -22,18 +20,19 @@ import software.amazon.awssdk.services.dynamodb.model.ProvisionedThroughput
 import software.amazon.awssdk.services.dynamodb.model.ResourceNotFoundException
 import java.net.URI
 
-private val log = LoggerFactory.getLogger("App")
+private val log = LoggerFactory.getLogger("DynamoDbConfig")
 
-const val DYNAMO_SERVER_URL = "http://localhost:8000"
 const val AWS_ACCESS_KEY_ID = "accessKey"
 const val AWS_SECRET_ACCESS_KEY = "secretKey"
 const val POINTS_GSI_NAME = "PointsIndex"
 
 object DynamoDbClientFactory {
-    fun create(): DynamoDbClient {
-        log.info("Creation client DynamoDb on  $DYNAMO_SERVER_URL")
+    fun create(environment: ApplicationEnvironment): DynamoDbClient {
+        val env = System.getenv("ENVIRONMENT") ?: "dev"
+        val dynamoUrl = environment.config.property("ktor.dynamo.url.$env").getString()
+        log.info("Creation client DynamoDb on  $dynamoUrl")
         return DynamoDbClient.builder()
-            .endpointOverride(URI.create(DYNAMO_SERVER_URL))
+            .endpointOverride(URI.create(dynamoUrl))
             .region(Region.EU_WEST_1)
             .credentialsProvider(
                 StaticCredentialsProvider.create(
@@ -45,6 +44,7 @@ object DynamoDbClientFactory {
 }
 
 fun ensurePlayersTable(client: DynamoDbClient, tableName: String = "Players") {
+
     try {
         client.describeTable(
             DescribeTableRequest.builder().tableName(tableName).build()

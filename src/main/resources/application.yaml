@@ -4,3 +4,7 @@ ktor:
             - com.ApplicationKt.module
     deployment:
         port: 8080
+    dynamo:
+        url:
+            dev: "http://localhost:8000"
+            test: "http://localhost:8001"

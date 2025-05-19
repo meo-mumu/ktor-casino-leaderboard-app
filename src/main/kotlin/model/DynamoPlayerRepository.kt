@@ -3,14 +3,7 @@ package com.model
 import com.db.POINTS_GSI_NAME
 import org.slf4j.LoggerFactory
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
-import software.amazon.awssdk.services.dynamodb.model.AttributeValue
-import software.amazon.awssdk.services.dynamodb.model.ConditionalCheckFailedException
-import software.amazon.awssdk.services.dynamodb.model.GetItemRequest
-import software.amazon.awssdk.services.dynamodb.model.PutItemRequest
-import software.amazon.awssdk.services.dynamodb.model.QueryRequest
-import software.amazon.awssdk.services.dynamodb.model.ScanRequest
-import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest
-import software.amazon.awssdk.services.dynamodb.model.DeleteItemRequest
+import software.amazon.awssdk.services.dynamodb.model.*
 
 private val log = LoggerFactory.getLogger("DynamoPlayerRepository")
 

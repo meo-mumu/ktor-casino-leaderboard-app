@@ -1,8 +1,14 @@
 version: "3.8"
 services:
-  dynamodb-local:
+  dynamodb-dev:
     image: amazon/dynamodb-local
-    container_name: dynamodb-local
+    container_name: dynamodb-dev
     ports:
       - "8000:8000"
+    command: "-jar DynamoDBLocal.jar -inMemory -sharedDb"
+  dynamodb-test:
+    image: amazon/dynamodb-local
+    container_name: dynamodb-test
+    ports:
+      - "8001:8000"
     command: "-jar DynamoDBLocal.jar -inMemory -sharedDb"

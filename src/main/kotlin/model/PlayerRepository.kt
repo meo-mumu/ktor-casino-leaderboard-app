@@ -1,5 +1,3 @@
-//PlayerRepository.kt
-
 package com.model
 
 interface PlayerRepository {
