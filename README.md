@@ -113,7 +113,7 @@ The ranking system implementation calculates player ranks dynamically during API
 This design choice ensures data consistency and eliminates the need for cascade updates in the database, 
 significantly reducing write operations overhead.
 
-Note on this project, that it is dynamoDb that takes care of the sorting, not the backend.
+**Note on this project, that it is dynamoDb that takes care of the sorting, not the backend.**
 
 For scenarios with high read volumes and lower update frequencies, we could consider an alternative approach: 
 storing ranks directly in the database and updating them through a batch process. 
